@@ -4,9 +4,6 @@
 #define CODESIZE 10000
 #define STACKSIZE 10000
 
-ssize_t write(int, const void *, size_t count);
-ssize_t read(int, void *buf, size_t count);
-
 int main() {
   register unsigned int instruction_pointer = 0;
   register unsigned short int data_pointer = 0;
