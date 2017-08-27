@@ -4,21 +4,23 @@
 #define CODESIZE 10000
 #define STACKSIZE 10000
 
-int main() {
-  register unsigned int instruction_pointer = 0;
-  register unsigned short int data_pointer = 0;
-  unsigned int stack_pointer = 0;
 
-  unsigned long int cells[DATASIZE] = {0};
-  unsigned char code[CODESIZE] = {0};
-  unsigned char input[INPUTSIZE] = {0};
-  unsigned int stack[STACKSIZE] = {0};
+unsigned int instruction_pointer = 0;
+unsigned short int data_pointer = 0;
+unsigned int stack_pointer = 0;
+
+unsigned long int cells[DATASIZE] = {0};
+unsigned char code[CODESIZE] = {0};
+unsigned char input[INPUTSIZE] = {0};
+unsigned int stack[STACKSIZE] = {0};
+
+int main() {
+  register unsigned char c = 0;
+  register unsigned int source = 0;
+  register unsigned int dest = 0;
 
   read(0, input, INPUTSIZE);
 
-  register unsigned char c;
-  unsigned int source = 0;
-  unsigned int dest = 0;
   while(1) {
     c = input[source];
     source++;
