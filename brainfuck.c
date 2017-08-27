@@ -4,10 +4,6 @@
 #define CODESIZE 10000
 #define STACKSIZE 10000
 
-
-unsigned int instruction_pointer = 0;
-unsigned short int data_pointer = 0;
-
 unsigned long int cells[DATASIZE] = {0};
 unsigned char code[CODESIZE] = {0};
 unsigned char input[INPUTSIZE] = {0};
@@ -19,6 +15,7 @@ int main() {
     register unsigned int source = 0;
     register unsigned int dest = 0;
     register unsigned int stack_pointer = 0;
+    register unsigned int instruction_pointer = 0;
 
     read(0, input, INPUTSIZE);
 
@@ -57,41 +54,45 @@ int main() {
     }
   }
 
-  instruction_pointer = 0;
-  while(1) {
-    switch(code[instruction_pointer]) {
-    case 0: return 0;
-    case '>':
-      data_pointer++;
-      break;
-    case '<':
-      data_pointer--;
-      break;
-    case '+':
-      cells[data_pointer]++;
-      break;
-    case '-':
-      cells[data_pointer]--;
-      break;
-    case '.':
-      write(1, &cells[data_pointer], 1);
-      break;
-    case ',':
-      read(0, &cells[data_pointer], 1);
-      break;
-    case '[':
-      if (cells[data_pointer] == 0) {
-        instruction_pointer = *(typeof(instruction_pointer) *)(code+instruction_pointer*sizeof(char)+1);
+  {
+    register unsigned int instruction_pointer = 0;
+    register unsigned short int data_pointer = 0;
+
+    while(1) {
+      switch(code[instruction_pointer]) {
+      case 0: return 0;
+      case '>':
+        data_pointer++;
+        break;
+      case '<':
+        data_pointer--;
+        break;
+      case '+':
+        cells[data_pointer]++;
+        break;
+      case '-':
+        cells[data_pointer]--;
+        break;
+      case '.':
+        write(1, &cells[data_pointer], 1);
+        break;
+      case ',':
+        read(0, &cells[data_pointer], 1);
+        break;
+      case '[':
+        if (cells[data_pointer] == 0) {
+          instruction_pointer = *(typeof(instruction_pointer) *)(code+instruction_pointer*sizeof(char)+1);
+        }
+        instruction_pointer += sizeof(instruction_pointer) + 1;
+        continue;
+      case ']':
+        if (cells[data_pointer] != 0) {
+          instruction_pointer = *(typeof(instruction_pointer) *)(code+instruction_pointer*sizeof(char)+1);
+        }
+        instruction_pointer += sizeof(instruction_pointer) + 1;
+        continue;
       }
-      instruction_pointer += sizeof(instruction_pointer) + 1;
-      continue;
-    case ']':
-      if (cells[data_pointer] != 0) {
-        instruction_pointer = *(typeof(instruction_pointer) *)(code+instruction_pointer*sizeof(char)+1);
-      }
-      instruction_pointer += sizeof(instruction_pointer) + 1;
-      continue;
+      instruction_pointer++;
     }
-    instruction_pointer++;
   }
 }

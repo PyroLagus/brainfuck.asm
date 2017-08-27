@@ -3,10 +3,6 @@
   CODESIZE equ 10000
   STACKSIZE equ 10000
 
-segment .data
-  ip dd 0                               ; instruction pointer
-  dp dw 0                               ; data pointer
-
 segment .bss
   cells resq DATASIZE                   ; data array
   input resb INPUTSIZE                  ; input array
@@ -63,10 +59,11 @@ other_valid:
   jmp init_lp
 init_le:
 
+  xor ebx, ebx                          ; instruction pointer = 0
+  xor r8d, r8d                          ; data pointer = 0
 
 main_lp:
-  mov ecx, [ip]
-  mov al, [code+ecx]
+  mov al, [code+ebx]
 
   test al, al
   je exit
@@ -87,61 +84,51 @@ main_lp:
   cmp al, 0x5D                          ; ]
   je eloop
 instr_done:
-  inc dword [ip]
+  inc dword ebx
   jmp main_lp
 
 
 next:
-  inc word [dp]
+  inc r8d
   jmp instr_done
 prev:
-  dec word [dp]
+  dec r8d
   jmp instr_done
 incr:
-  mov ebx, [dp]
-  inc qword [cells+ebx*8]
+  inc qword [cells+r8d*8]
   jmp instr_done
 decr:
-  mov ebx, [dp]
-  dec qword [cells+ebx*8]
+  dec qword [cells+r8d*8]
   jmp instr_done
 print:
   mov rax, 1
   mov rdi, 1
-  mov ebx, [dp]
-  lea rsi, [cells+ebx*8]
+  lea rsi, [cells+r8d*8]
   mov rdx, 1
   syscall
   jmp instr_done
 read:
   mov rax, 0
   mov rdi, 0
-  mov ebx, [dp]
-  lea rsi, [cells+ebx*8]
+  lea rsi, [cells+r8d*8]
   mov rdx, 1
   syscall
   jmp instr_done
 sloop:
-  mov ebx, [dp]
-  mov rax, qword [cells+ebx*8]
+  mov rax, qword [cells+r8d*8]
   test rax, rax
   jne sloop_end
-  mov ecx, [ip]
-  mov ecx, [code+ecx+1]
-  mov [ip], ecx
+  mov ebx, [code+ebx+1]
 sloop_end:
-  add [ip], dword 5
+  add ebx, dword 5
   jmp main_lp
 eloop:
-  mov ebx, [dp]
-  mov rax, qword [cells+ebx*8]
+  mov rax, qword [cells+r8d*8]
   test rax, rax
   je eloop_end
-  mov ecx, [ip]
-  mov ecx, [code+ecx+1]
-  mov [ip], ecx
+  mov ebx, [code+ebx+1]
 eloop_end:
-  add [ip], dword 5
+  add ebx, dword 5
   jmp main_lp
 
 check_symbol:
