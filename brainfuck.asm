@@ -167,11 +167,3 @@ exit:
   mov rax, 60
   mov rdi, 0
   syscall
-
-print_code:
-  mov rax, 1
-  mov rdi, 1
-  mov rsi, code
-  mov rdx, CODESIZE
-  syscall
-  ret
