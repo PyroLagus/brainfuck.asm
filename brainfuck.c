@@ -7,7 +7,6 @@
 
 unsigned int instruction_pointer = 0;
 unsigned short int data_pointer = 0;
-unsigned int stack_pointer = 0;
 
 unsigned long int cells[DATASIZE] = {0};
 unsigned char code[CODESIZE] = {0};
@@ -18,6 +17,7 @@ int main() {
   register unsigned char c = 0;
   register unsigned int source = 0;
   register unsigned int dest = 0;
+  register unsigned int stack_pointer = 0;
 
   read(0, input, INPUTSIZE);
 

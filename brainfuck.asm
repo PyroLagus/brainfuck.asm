@@ -6,7 +6,6 @@
 segment .data
   ip dd 0                               ; instruction pointer
   dp dw 0                               ; data pointer
-  stackp dd 0                           ; stack pointer
 
 segment .bss
   cells resq DATASIZE                   ; data array
@@ -30,6 +29,8 @@ init:
   mov esi, input
   mov edi, code
 
+  xor ebx, ebx                          ; stack pointer = 0
+
 init_lp:
   lodsb                                 ; al = [esi], esi++
   test al, al                           ; stop reading if null is encountered
@@ -38,22 +39,21 @@ init_lp:
   jmp check_symbol
 
 left_bracket:
-  mov ebx, [stackp]
   mov [stack+ebx*4], ecx                ; push instruction address into stack
-  inc dword [stackp]
+  inc dword ebx
   stosb
   add edi, 4                            ; make space for instruction address
   add ecx, 5                            ; move instruction pointer forward, and skip the four bytes for the address
   jmp init_lp
 
 right_bracket:
-  dec dword [stackp]
-  mov ebx, [stackp]
-  mov ebx, [stack+ebx*4]                ; pop from stack into ebx
+  dec dword ebx
+  mov ebx, ebx
+  mov edx, [stack+ebx*4]                ; pop from stack into ebx
   stosb
-  mov [edi], dword ebx                  ; put address of previous [ after the current ]
+  mov [edi], dword edx                  ; put address of previous [ after the current ]
   add edi, 4
-  mov [code+ebx+1], dword ecx           ; put address of current ] after the previous [
+  mov [code+edx+1], dword ecx           ; put address of current ] after the previous [
   add ecx, 5                            ; move instruction pointer forward, and skip the four bytes for the address
   jmp init_lp
 
