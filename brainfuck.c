@@ -14,45 +14,47 @@ unsigned char input[INPUTSIZE] = {0};
 unsigned int stack[STACKSIZE] = {0};
 
 int main() {
-  register unsigned char c = 0;
-  register unsigned int source = 0;
-  register unsigned int dest = 0;
-  register unsigned int stack_pointer = 0;
+  {
+    register unsigned char c = 0;
+    register unsigned int source = 0;
+    register unsigned int dest = 0;
+    register unsigned int stack_pointer = 0;
 
-  read(0, input, INPUTSIZE);
+    read(0, input, INPUTSIZE);
 
-  while(1) {
-    c = input[source];
-    source++;
-    if(c == 0) {
-      break;
-    }
-    switch(c) {
-    case '>': break;
-    case '<': break;
-    case '+': break;
-    case '-': break;
-    case '.': break;
-    case ',': break;
-    case '[':
-      stack[stack_pointer] = instruction_pointer;
-      stack_pointer++;
+    while(1) {
+      c = input[source];
+      source++;
+      if(c == 0) {
+        break;
+      }
+      switch(c) {
+      case '>': break;
+      case '<': break;
+      case '+': break;
+      case '-': break;
+      case '.': break;
+      case ',': break;
+      case '[':
+        stack[stack_pointer] = instruction_pointer;
+        stack_pointer++;
+        code[dest] = c;
+        dest += sizeof(instruction_pointer) + 1;
+        instruction_pointer += sizeof(instruction_pointer) + 1;
+        continue;
+      case ']':
+        stack_pointer--;
+        *(typeof(instruction_pointer) *)(code+dest*sizeof(char)+1) = stack[stack_pointer];
+        code[dest] = c;
+        dest += sizeof(instruction_pointer) + 1;
+        *(typeof(instruction_pointer) *)(code+stack[stack_pointer]*sizeof(char)+1) = instruction_pointer;
+        instruction_pointer += sizeof(instruction_pointer) + 1;
+      default: continue;
+      }
       code[dest] = c;
-      dest += sizeof(instruction_pointer) + 1;
-      instruction_pointer += sizeof(instruction_pointer) + 1;
-      continue;
-    case ']':
-      stack_pointer--;
-      *(typeof(instruction_pointer) *)(code+dest*sizeof(char)+1) = stack[stack_pointer];
-      code[dest] = c;
-      dest += sizeof(instruction_pointer) + 1;
-      *(typeof(instruction_pointer) *)(code+stack[stack_pointer]*sizeof(char)+1) = instruction_pointer;
-      instruction_pointer += sizeof(instruction_pointer) + 1;
-    default: continue;
+      dest++;
+      instruction_pointer++;
     }
-    code[dest] = c;
-    dest++;
-    instruction_pointer++;
   }
 
   instruction_pointer = 0;
